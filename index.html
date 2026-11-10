@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mavis for Mac</title>
+<meta name="description" content="Mavis lives beside your Dock and does the work on your Mac. Download the beta.">
+<style>
+/* Mavis Modern v2: the only place raw design values live.
+   Source: docs/mavis-glass.html#mv2,forest (data-t=mod, data-bar=v2), resolved through its full cascade and confirmed
+   against computed styles in both themes. Light is the default; .dark on any ancestor (html or a preview) flips a subtree. */
+
+@font-face{font-family:"Anthropic Sans";font-weight:400;font-style:normal;font-display:swap;src:local("Anthropic Sans"),url(https://assets.claude.ai/Fonts/AnthropicSans-Text-Regular-Static.otf) format("opentype")}
+@font-face{font-family:"Anthropic Sans";font-weight:500;font-style:normal;font-display:swap;src:url(https://assets.claude.ai/Fonts/AnthropicSans-Text-Medium-Static.otf) format("opentype")}
+@font-face{font-family:"Mavis Numbers";font-weight:400;src:local("Helvetica Neue"),local("HelveticaNeue");unicode-range:U+25,U+30-39,U+3A}
+@font-face{font-family:"Mavis Numbers";font-weight:500;src:local("Helvetica Neue Medium"),local("HelveticaNeue-Medium");unicode-range:U+25,U+30-39,U+3A}
+
+/* Shared by both themes */
+:root{
+  --sans:"Mavis Numbers","Anthropic Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  /* one device pixel: the page script compensates these for zoom, so strokes never smear */
+  --hl:1px;--hl2:1.5px;
+
+  /* type: weight size/line */
+  --type-body:400 14px/20px var(--sans);
+  --type-chrome:400 14px/20px var(--sans);
+  --type-foot:400 13px/16px var(--sans);
+  --type-day:500 13px/16px var(--sans);
+  --type-meta:400 12px/16px var(--sans);
+  --type-composer:400 15px/24px var(--sans);
+  --type-pill:400 15px/20px var(--sans);
+
+  /* corners, nested: control + inset = next layer out */
+  --radius-window:24px;--radius-tray:24px;--radius-sheet:20px;--radius-screen:16px;
+  --radius-bubble:18px;--radius-menu:10px;--radius-badge:10px;--radius-row:6px;--radius-attachment:6px;
+  --radius-pill:28px;--radius-dock-control:20px;--radius-round-control:16px;--radius-bar-control:14px;--radius-foot-control:12px;
+
+  /* control heights: a capsule's radius is always half of these */
+  --h-foot:24px;--h-bar:28px;--h-round:32px;--h-dock:40px;--h-pill:56px;
+
+  /* the 4 pt rhythm, plus the optical half-steps controls use for even visible space */
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;
+  --optical-6:6px;--optical-10:10px;--optical-14:14px;
+
+  /* layout */
+  --win-w:1544px;--win-h:686px;--chat-w:520px;--bar-h:36px;
+
+  /* lights are macOS's own */
+  --light-close:#ff5f57;--light-min:#febc2e;--light-zoom:#28c840;--light-edge:rgb(0 0 0/.1);
+  --blue:#1982fc;--on-accent:#ffffff;--screen-bg:#000000;
+  --focus-a:rgb(10 122 255/.75);--focus-b:rgb(10 122 255/.22);--selection:rgb(10 122 255/.22);--selection-on-bubble:rgb(255 255 255/.3);
+  --glow:0 0 0 1px var(--focus-a),0 0 0 3.5px var(--focus-b);
+
+  /* identity: fills a face or project tile, with on-accent on top at 4.5:1 or better. Same in both themes. */
+  --id-teal:#17866b;--id-pink:#cf4079;--id-blue:#4073d4;--id-orange:#ac6612;--id-ember:#cc4d29;--id-red:#c9352f;--id-violet:#8b5ade;--id-brown:#8d6e5a;--id-olive:#5f7a4d;--id-slate:#4a4e57;
+
+  /* motion */
+  --ease:cubic-bezier(.23,1,.32,1);--ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --dur-stroke:180ms;--dur-menu-out:120ms;--dur-pill-swap:160ms;--dur-bubble-in:260ms;
+}
+
+/* Light */
+:root,.light{
+  color-scheme:light;
+  --rule-rgb:23 34 50;
+  --glass:rgb(255 255 255/.95);--win-backdrop:blur(44px) saturate(1.5) brightness(1.5);--chat:#ffffff;
+  --plate-a:#fbfcfd;--plate-b:#eef0f3;--top-lit:rgb(255 255 255/.5);
+  --tray-a:#f1f2f5;--tray-b:#e9ebef;
+  --ctl-a:#ffffff;--press-a:#e7e9ec;--press-b:#dee1e5;
+  --bar-ctl-a:#ffffff;--bar-press-a:#e7e9ec;--bar-press-b:#dee1e5;
+  --ctl-stroke:#dee0e3;--ctl-hover-stroke:#c4c7cb;
+  --bar-ctl-stroke:#d7d9dd;--bar-ctl-hover-stroke:#bec1c6;
+  --ctl-press-stroke:rgb(23 34 50/.27);--bar-ctl-press-stroke:rgb(23 34 50/.27);
+  --hair:#dee0e4;--seg-line:#dee0e4;--seg-on:#5f6267;
+  --hover:rgb(23 34 50/.05);--active:rgb(23 34 50/.1);--line:rgb(23 34 50/.11);
+  --ink:#1b1e22;--ink-meta:#565a60;--ink3:#62666d;
+  --warn:#ffcc00;--dred:#d70015;
+  --menu-bg:color-mix(in srgb,#ffffff 86%,transparent);
+  --pill-bg:rgb(255 255 255/.72);--pill-backdrop:blur(36px) saturate(1.7) brightness(1.3);
+  --st-ready-bg:rgb(48 199 90/.14);--st-ready-ink:#146c31;--st-ready-dot:#28b850;
+  --st-you-bg:rgb(11 112 232/.11);--st-you-ink:#0a5fc4;--st-you-dot:#1982fc;
+  --st-busy-bg:rgb(214 145 0/.16);--st-busy-ink:#8a5d00;--st-busy-dot:#e0a100;
+  --st-off-bg:rgb(98 102 109/.12);--st-off-ink:#55595f;--st-off-dot:#8b8f96;
+  --blur-btn:#f9fafb;--blur-me:#d7d9dd;--blur-ink:#8f9297;--blur-light:#d7d9dc;
+
+  --win-shadow:0 0 0 .5px rgb(0 0 0/.28),0 8px 20px rgb(0 0 0/.2),0 26px 70px rgb(0 0 0/.42);
+  --win-shadow-blur:0 0 0 .5px rgb(0 0 0/.22),0 6px 14px rgb(0 0 0/.14),0 16px 44px rgb(0 0 0/.26);
+  --win-edge:none;
+  --menu-shadow:0 0 0 .5px rgb(23 34 50/.2),0 4px 12px rgb(23 34 50/.09),0 18px 40px -10px rgb(23 34 50/.3);
+  --screen-shadow:0 0 0 .5px rgb(23 34 50/.22),0 1px 2px rgb(23 34 50/.12),0 4px 8px -4px rgb(23 34 50/.14);
+  --pill-shadow:0 0 0 .5px rgb(23 34 50/.2),0 12px 24px -12px rgb(0 0 0/.4);
+
+  --ctl:inset 0 0 0 var(--hl) var(--ctl-stroke);
+  --ctl-hover:inset 0 0 0 var(--hl2) var(--ctl-hover-stroke);
+  --ctl-press:inset 0 0 0 1px var(--ctl-press-stroke);
+  --plate-grad:linear-gradient(var(--plate-a) 0%,color-mix(in oklab,var(--plate-b) 5%,var(--plate-a)) 28%,color-mix(in oklab,var(--plate-b) 20%,var(--plate-a)) 50%,color-mix(in oklab,var(--plate-b) 48%,var(--plate-a)) 70%,color-mix(in oklab,var(--plate-b) 78%,var(--plate-a)) 87%,var(--plate-b) 100%);
+  --tray-bg:linear-gradient(var(--tray-a),var(--tray-b));
+}
+
+/* Dark: flat. No drop shadows or gradients inside the window; surfaces step apart and strokes stay. */
+.dark{
+  color-scheme:dark;
+  --rule-rgb:217 230 249;
+  --glass:rgb(14 15 17/.78);--win-backdrop:blur(44px) saturate(1.7) brightness(.6);--chat:#141517;
+  --plate-a:#202125;--plate-b:#202125;--top-lit:transparent;
+  --tray-a:#1d1e20;--tray-b:#1d1e20;
+  --ctl-a:#2a2b2e;--press-a:#343538;--press-b:#343538;
+  --bar-ctl-a:#2c2d31;--bar-press-a:#36373b;--bar-press-b:#36373b;
+  --ctl-stroke:#313235;--ctl-hover-stroke:#46484c;
+  --bar-ctl-stroke:#38393e;--bar-ctl-hover-stroke:#4b4d52;
+  --ctl-press-stroke:#313235;--bar-ctl-press-stroke:#38393e;
+  --hair:#2d2e33;--seg-line:#3d3e43;--seg-on:#54575c;
+  --hover:rgb(217 230 249/.08);--active:rgb(217 230 249/.14);--line:rgb(217 230 249/.14);
+  --ink:#ececee;--ink-meta:#b2b6bc;--ink3:#9a9fa6;
+  --warn:#ffd60a;--dred:#ff453a;
+  --menu-bg:color-mix(in srgb,#2a2b2e 88%,transparent);
+  --pill-bg:rgb(18 20 24/.42);--pill-backdrop:blur(36px) saturate(1.8) brightness(.68);
+  --st-ready-bg:rgb(48 199 90/.15);--st-ready-ink:#63da86;--st-ready-dot:#28b850;
+  --st-you-bg:rgb(77 150 245/.18);--st-you-ink:#8dbcf9;--st-you-dot:#5a9ef5;
+  --st-busy-bg:rgb(224 161 0/.16);--st-busy-ink:#e8bd5a;--st-busy-dot:#e0a100;
+  --st-off-bg:rgb(178 182 188/.12);--st-off-ink:#b2b6bc;--st-off-dot:#8b8f96;
+  --blur-btn:#292c30;--blur-me:#3a3d42;--blur-ink:#71757a;--blur-light:#44484d;
+
+  --win-shadow:0 0 0 .5px rgb(0 0 0/.7);
+  --win-shadow-blur:0 0 0 .5px rgb(0 0 0/.7);
+  --win-edge:inset 0 0 0 .5px rgb(255 255 255/.08);
+  --menu-shadow:0 0 0 1px #313235;
+  --screen-shadow:none;
+  --pill-shadow:inset 0 0 0 .5px rgb(255 255 255/.12);
+
+  --ctl:inset 0 0 0 var(--hl) var(--ctl-stroke);
+  --ctl-hover:inset 0 0 0 var(--hl2) var(--ctl-hover-stroke);
+  --ctl-press:inset 0 0 0 1px var(--ctl-press-stroke);
+  --plate-grad:linear-gradient(var(--plate-a) 0%,color-mix(in oklab,var(--plate-b) 5%,var(--plate-a)) 28%,color-mix(in oklab,var(--plate-b) 20%,var(--plate-a)) 50%,color-mix(in oklab,var(--plate-b) 48%,var(--plate-a)) 70%,color-mix(in oklab,var(--plate-b) 78%,var(--plate-a)) 87%,var(--plate-b) 100%);
+  --tray-bg:var(--tray-a);
+}
+
+/* The toolbar's own set: controls sit half a step stronger here so they stand on the bar. Both themes resolve from the block above. */
+.plate{
+  --ctl-a:var(--bar-ctl-a);--press-a:var(--bar-press-a);--press-b:var(--bar-press-b);
+  --ctl:inset 0 0 0 var(--hl) var(--bar-ctl-stroke);
+  --ctl-hover:inset 0 0 0 var(--hl2) var(--bar-ctl-hover-stroke);
+  --ctl-press:inset 0 0 0 1px var(--bar-ctl-press-stroke);
+}
+
+</style>
+<script>
+  const dark = matchMedia('(prefers-color-scheme: dark)');
+  const apply = () => document.documentElement.classList.toggle('dark', dark.matches);
+  apply(); dark.addEventListener('change', apply);
+</script>
+<style>
+  html, body { margin: 0; background: var(--chat); color: var(--ink); font: var(--type-body); }
+  main { max-width: var(--chat-w); margin: 0 auto; padding: var(--space-8) var(--space-4); }
+  h1 { font: var(--type-body); margin: 0; color: var(--ink); }
+  p { color: var(--ink-meta); margin: var(--space-2) 0 0; }
+  .get { display: inline-flex; align-items: center; height: var(--h-round); padding: 0 var(--space-4); margin-top: var(--space-6);
+         border-radius: var(--radius-round-control); background: var(--blue); color: var(--on-accent); text-decoration: none; }
+  .get:focus-visible { outline: none; box-shadow: var(--glow); }
+  .note { font: var(--type-meta); }
+  footer { margin-top: var(--space-8); padding-top: var(--space-4); border-top: var(--hl) solid var(--hair); font: var(--type-meta); color: var(--ink-meta); }
+  footer a { color: var(--ink-meta); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Mavis for Mac</h1>
+  <p>Mavis lives beside your Dock. Ask for anything in plain words, from any app, and it does the work on your Mac with Claude.</p>
+  <a class="get" href="https://github.com/Mouaddotmd/mavis-releases/releases/latest/download/Mavis.dmg">Download the beta</a>
+  <p class="note">For macOS 26 or later. The first time you open it, macOS asks you to allow it once in System Settings, Privacy &amp; Security, Open Anyway. Mavis keeps itself up to date after that.</p>
+  <footer><a href="privacy.html">Privacy</a> · Questions: <a href="mailto:mouadboughaba57@gmail.com">mouadboughaba57@gmail.com</a></footer>
+</main>
+</body>
+</html>
