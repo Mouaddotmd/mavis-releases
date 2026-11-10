@@ -159,6 +159,12 @@
   .get { display: inline-flex; align-items: center; height: var(--h-round); padding: 0 var(--space-4); margin-top: var(--space-6);
          border-radius: var(--radius-round-control); background: var(--blue); color: var(--on-accent); text-decoration: none; }
   .get:focus-visible { outline: none; box-shadow: var(--glow); }
+  .cmd { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-3); padding: var(--space-3) var(--space-4);
+         border-radius: var(--radius-row); background: var(--ctl-a); box-shadow: var(--ctl); }
+  .cmd code { font: var(--type-meta); font-family: var(--mono); color: var(--ink); overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+  .cmd button { flex: none; height: var(--h-bar); padding: 0 var(--space-3); border: 0; border-radius: var(--radius-bar-control);
+                font: var(--type-chrome); color: var(--ink); background: var(--ctl-a); box-shadow: var(--ctl); cursor: default; }
+  .cmd button:focus-visible { outline: none; box-shadow: var(--glow); }
   .note { font: var(--type-meta); }
   footer { margin-top: var(--space-8); padding-top: var(--space-4); border-top: var(--hl) solid var(--hair); font: var(--type-meta); color: var(--ink-meta); }
   footer a { color: var(--ink-meta); }
@@ -168,8 +174,13 @@
 <main>
   <h1>Mavis for Mac</h1>
   <p>Mavis lives beside your Dock. Ask for anything in plain words, from any app, and it does the work on your Mac with Claude.</p>
-  <a class="get" href="https://github.com/Mouaddotmd/mavis-releases/releases/latest/download/Mavis.dmg">Download the beta</a>
-  <p class="note">For macOS 26 or later. The first time you open it, macOS asks you to allow it once in System Settings, Privacy &amp; Security, Open Anyway. Mavis keeps itself up to date after that.</p>
+  <p class="note" style="margin-top: var(--space-6); color: var(--ink);">Open Terminal, paste this, and press return:</p>
+  <div class="cmd">
+    <code id="cmd">curl -fsSL https://mouaddotmd.github.io/mavis-releases/install.sh | bash</code>
+    <button type="button" id="copy" onclick="navigator.clipboard.writeText(document.getElementById('cmd').textContent).then(()=>{copy.textContent='Copied';setTimeout(()=>copy.textContent='Copy',1500)})">Copy</button>
+  </div>
+  <p class="note">Mavis installs itself and opens, with no security warning to click through. For Apple silicon Macs on macOS 26 or later. Mavis keeps itself up to date after that.</p>
+  <p class="note" style="margin-top: var(--space-4);">Prefer a download? <a href="https://github.com/Mouaddotmd/mavis-releases/releases/latest/download/Mavis.dmg" style="color: var(--ink-meta);">Get the disk image</a>. macOS will ask you to allow it once in System Settings, Privacy &amp; Security, Open Anyway.</p>
   <footer><a href="privacy.html">Privacy</a> · Questions: <a href="mailto:mouadboughaba57@gmail.com">mouadboughaba57@gmail.com</a></footer>
 </main>
 </body>
